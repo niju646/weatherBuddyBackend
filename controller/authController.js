@@ -48,7 +48,9 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
-  const user = await User.findOne({ username });
+
+  const user = await User.findOne({ where: { username } }); // i changed
+
   if (!user) return res.status(404).json({ message: "User not found" });
 
   const match = await bcrypt.compare(password, user.password);
@@ -60,7 +62,12 @@ export const login = async (req, res) => {
 
   refreshTokens.add(refreshToken); // Save valid token
 
-  return res.json({ accessToken, refreshToken });
+  return res.json({
+    accessToken,
+    refreshToken,
+    username: user.username,
+    email: user.email,
+  }); // i have add the user name and email in this.
 };
 
 export const refreshToken = (req, res) => {
